@@ -2,8 +2,9 @@
 :icons: font
 :hide-uri-scheme:
 
+= VMWare specific environment
 
-= Access to vSphere
+== Access to vSphere
 
 In order for machine config operator to interact with the vSphere API, we need to expose the endpoint to the Openshift nodes.
 

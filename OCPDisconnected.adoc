@@ -40,10 +40,10 @@ bla jkdlsfjskldjf
 
 = Openshift Environment
 
-include::{chapters-path}environment/environment.adoc[leveloffset=+1]
+== Generic
+include::{chapters-path}environment/environment.adoc[leveloffset=+2]
 
-== VMWare specific environment
-
+== VMWare
 include::{chapters-path}environment/vsphere.adoc[leveloffset=+2]
 
 
