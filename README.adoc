@@ -1,0 +1,1017 @@
+= Disconected Openshift 
+Pieter Malan
+:doctype: book
+:icons: font
+:hide-uri-scheme:
+
+:appendix-caption: Exhibit
+:sectnums:
+:toc: macro
+
+
+:toclevels: 2
+:icons: font
+
+:relfileprefix: ../
+:outfilesuffix:
+:sectnums:
+:sectnumlevels: 6
+:partnums:
+:chapter-signifier: Chapter
+:part-signifier: Part
+:book: true
+:pdf: true
+:source-highlighter: rouge
+
+:chapters-path: chapters/
+:imagesdir: images/
+
+
+image:pexels-simon-berger-1323550.jpeg[page=1]
+Photo by Simon Berger from Pexels - https://www.pexels.com/photo/silhouette-of-mountains-1323550/
+
+toc::[]
+
+= VMWare IPI with Windows Machine Operator in a disconnected Openshift
+
+== Preparation
+
+=== Access to vSphere
+
+In order for machine config operator to interact with the vSphere API, we need to expose the endpoint to the Openshift nodes.
+
+In vSphere, you can add a total of 4 network adapters on the appliance. Second adapter will be earmarked for VCHA, so if needed you have to add an additional adapter to configure.
+
+Make sure that the hostname specified to access vCenter, resolves within the subnet as the ip address specified on the third adapter.
+
+NOTE: VMware VCSA 7 multiple network adapters https://4sysops.com/archives/vmware-vcsa-7-multiple-network-adapters/
+
+=== DNS
+On a node, with a fixed ip in the disconnected network, install dns. In this example 10.0.0.2. 
+
+As root install dnsmasq
+[code]
+----
+dnf install -y dnsmasq
+----
+
+Create /etc/dnsmasq.d/openshift-4.conf, where 10.0.0.6 is our apps wildcard, and "do" is our cluster name (disconnected "OpenShift").
+
+[code]
+----
+strict-order
+domain=pl.pietersmalan.com
+expand-hosts
+server=10.0.0.2
+interface=ens224
+address=/apps.do.pl.pietersmalan.com/10.0.0.6
+addn-hosts=/etc/dnsmasq-openshift-4.addnhosts
+----
+
+Add the dns entries for OpenShift, .5 for API, and the vSphere ip from previous step:
+
+/etc/dnsmasq-openshift-4.addnhosts
+[code]
+----
+10.0.0.5 api.do.pl.pietersmalan.com api-int.do.pl.pietersmalan.com
+10.0.0.2 bastion.pietersmalan.com bastion.pl.pietersmalan.com
+10.0.0.250 vcsa.pietersmalan.com
+----
+
+
+=== DHCP
+
+[code]
+----
+dnf -y install dhcp-server
+----
+
+[code]
+----
+vi /etc/dhcp/dhcpd.conf
+----
+
+[code]
+----
+#
+# DHCP Server Configuration file.
+#   see /usr/share/doc/dhcp-server/dhcpd.conf.example
+#   see dhcpd.conf(5) man page
+#
+# Set DNS name and DNS server's IP address or hostname
+DHCPDARGS="ens224";
+option domain-name     "pl.pietersmalan.com";
+option domain-name-servers 10.0.0.2;
+
+# Declare DHCP Server
+authoritative;
+
+# The default DHCP lease time
+default-lease-time 600;
+
+# Set the maximum lease time
+max-lease-time 7200;
+
+# Set Network address, subnet mask and gateway
+
+subnet 10.0.0.0 netmask 255.255.255.0 {
+    # Range of IP addresses to allocate
+    range dynamic-bootp 10.0.0.10 10.0.0.200;
+    # Provide broadcast address
+    option broadcast-address 10.0.0.255;
+    # Set default gateway
+    option routers 10.0.0.1;
+}
+----
+
+[code]
+----
+systemctl enable --now dhcpd
+----
+
+=== Setup Quay Mirror Registry
+
+. Download Quay Mirror Registry - https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz
+. Get a signed certificate, a wild card cert does work.
+. Prepare a user on target machine to host Quay
+  .. Make sure the user has sudo priviledges (visudo + wheel group)
+  .. As the user do the following:
+[source]  
+----
+ssh-keygen
+ssh-copy-id quayhostname
+sudo ./mirror-registry install --initUser quay --initPassword quayquay --quayHostname quayhostname --sslCert cert.pem --sslKey privkey.pem 
+----
+[start=4]
+. Open firewall port for Quay, if firewall is in use
+[code]
+----
+sudo firewall-cmd --add-port=8443/tcp --zone=public --permanent
+sudo firewall-cmd --reload
+----
+
+#### Setup Mirror process
+NOTE: It is assumed that the mirror registry has access to the internet and the target private subnet where Openshift will be installed. If not the mirror process should be done with an export to a tar file, then imported into the mirror registry in the private subnet, using a copy the tar file. See https://docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#mirroring-image-set-full 
+
+. Download the Openshift Installer, client and mirror plugin:
+
+[code]
+----
+mkdir ~/bin
+cd ~/bin
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-linux.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/oc-mirror.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz
+tar xvf openshift-client-linux.tar.gz
+tar xvf openshift-install-linux.tar.gz
+tar xvf oc-mirror.tar.gz
+
+----
+[start=2]
+. Configure security for pulling and pushing images:
+[code]
+----
+mkdir ~/mirror
+cd ~/mirror
+<put your pullsecret copied form https://console.redhat.com/openshift/downloads in a file called pull-secret>
+cat ./pull-secret | jq . > pull-secret.json
+
+----
+
+Append to the list of auths in the pull-secret.json, the local mirror registry credentails. The credentials can be generated through the Quay web site, as a logged in user - https://quayhostname:8443/user/quay?tab=settings, *Generate Encrypted Password*, then after entering password, *Docker Configuration* > View quay-auth.json :
+
+[code]
+----
+      "auths": {
+        "<mirror_registry>": { 
+          "auth": "<credentials>", 
+          "email": "you@example.com"
+      },
+----
+[start=3]
+. "Authenticate" against registry, to allow *oc mirror* access to all our registries involved:
+   
+[code]
+----
+mkdir ~/.docker
+cp pull-secret.json ~/.docker/config.json
+----
+
+An alternative to the above step, to log into all registries, as defined in pull-secret.json:
+
+[example]
+Dale Bewley - https://gist.github.com/dlbewley/ae1d678300db47cfcee8ec141385eb22
+
+[code]
+----
+PULL_SECRET_PATH=pull-secret.json
+for R in $(cat $PULL_SECRET_PATH | jq -r '.auths|keys[]'); do
+  echo "Logging into $R";
+  U=$(jq -r ".auths.\"$R\".auth" $PULL_SECRET_PATH | base64 -d | awk -F: '{print $1}')
+  P=$(jq -r ".auths.\"$R\".auth" $PULL_SECRET_PATH | base64 -d | awk -F: '{print $2}')
+  podman login -u $U -p $P $R
+done
+----
+
+. Optional, check the availability of wmco in release 4.11, and the operator name, then query the available versions for operator:
+[code]
+----
+oc-mirror list operators --catalog registry.redhat.io/redhat/redhat-operator-index:v4.11|grep windows
+windows-machine-config-operator               Windows Machine Config Operator   stable
+
+oc-mirror list operators --package windows-machine-config-operator --catalog registry.redhat.io/redhat/redhat-operator-index:v4.11
+PACKAGE                          CHANNEL  HEAD
+windows-machine-config-operator  preview  windows-machine-config-operator.v6.0.0
+windows-machine-config-operator  stable   windows-machine-config-operator.v6.0.0
+----
+
+[start=4]
+. Create a template to start with, or copy the sample:
+[code]
+----
+oc-mirror init --registry quayhost:8443/mirror/oc-mirror-metadata > imageset-config.yaml 
+----
+
+Modified contents of imageset-config.yaml, notice the imageURL, produced by the command above with required operators section added for wmco.
+
+[code]
+----
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  registry:
+    imageURL: bastion.pietersmalan.com:8443/mirror/oc-mirror-metdata
+    skipTLS: false
+mirror:
+  platform:
+    architectures:
+    - amd64
+    channels:
+    - name: stable-4.11
+      minVersion: 4.11.9
+      maxVersion: 4.11.9
+      type: ocp
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.11
+    packages:
+    - name: windows-machine-config-operator
+      channels:
+      - name: stable
+  additionalImages:
+    - name: registry.redhat.io/ubi8/ubi:latest
+    - name: registry.redhat.io/redhat/redhat-operator-index:v4.11
+  
+----
+
+NOTE: For additional configuration, for example min/max version definitions etc, see https://docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#oc-mirror-imageset-config-params_installing-mirroring-disconnected
+[start=5]
+. Start the mirror proces:
+[code]
+----
+oc-mirror --config=./imageset-config.yaml docker://bastion.pietersmalan.com:8443
+----
+
+The output would be similar to the following:
+[code]
+----
+Checking push permissions for bastion.pietersmalan.com:8443
+Creating directory: oc-mirror-workspace/src/publish
+Creating directory: oc-mirror-workspace/src/v2
+Creating directory: oc-mirror-workspace/src/charts
+Creating directory: oc-mirror-workspace/src/release-signatures
+No metadata detected, creating new workspace
+wrote mirroring manifests to oc-mirror-workspace/operators.1667285372/manifests-redhat-operator-index
+
+To upload local images to a registry, run:
+
+	oc adm catalog mirror file://redhat/redhat-operator-index:v4.11 REGISTRY/REPOSITORY
+bastion.pietersmalan.com:8443/
+  openshift/release
+    blobs:
+      quay.io/openshift-release-dev/ocp-v4.0-art-dev sha256:d8190195889efb5333eeec18af9b6c82313edd4db62989bd3a357caca4f13f0e 1.404KiB
+      quay.io/openshift-release-dev/ocp-v4.0-art-dev sha256:53525f8b521a5f9317c9ce853653e176e9ed1037575ae7f5da2a2bed6a450060 1.804KiB
+      quay.io/openshift-release-dev/ocp-v4.0-art-dev sha256:17a7d9dcb5c2145df3d0adae108e5bfb9880760459672b1502bc363466740455 2.047KiB
+.....
+ manifests:
+      sha256:94b611f00f51c9acc44ca3f4634e46bd79d7d28b46047c7e3389d250698f0c99 -> 4.11.9-x86_64
+  openshift4-wincw/windows-machine-config-operator-bundle
+    blobs:
+      registry.redhat.io/openshift4-wincw/windows-machine-config-operator-bundle sha256:792a6efb36636881408b916f3b5c4ad22244bfba20619a6dc3fe76dba07de98c 4.984KiB
+      registry.redhat.io/openshift4-wincw/windows-machine-config-operator-bundle sha256:711db228ba0f794e7092f376ebe937957b50e53931f676996cc17a2cb3133533 10.67KiB
+    manifests:
+      sha256:17b5c18bacb38a2e4d0c3e53e166857af9c53f9e02dd0416b34974c1376f4f5e -> 3bb4a030
+  openshift4-wincw/windows-machine-config-rhel8-operator
+......  
+info: Mirroring completed in 3m26.03s (73.36MB/s)
+Rendering catalog image "bastion.pietersmalan.com:8443/redhat/redhat-operator-index:v4.11" with file-based catalog 
+Writing image mapping to oc-mirror-workspace/results-1667285694/mapping.txt
+Writing CatalogSource manifests to oc-mirror-workspace/results-1667285694
+Writing ICSP manifests to oc-mirror-workspace/results-1667285694
+----
+
+[start=6]
+. Take not of the location of the  results directory :
+[code]
+----
+cd oc-mirror-workspace/results-1667285694
+more mapping.txt
+pwd
+----
+
+WARNING: All the repositories in Quay will be created as "private", make sure to make them "public" through the Quay interface, before starting the OpenShift installer.
+
+== OpenShift Installation
+
+WARNING: Before runnnig the openshift-install command, compare the version numbers of the images as listed in the mapping.txt (/release:4.11.9-x86) file to the version of the openshift-install command, by executing *openshift-install version*. If not the same version, get the corresponding version of the openshift-install binary.
+
+=== Install vCenter Certificates
+NOTE:Only required if vCenter does not use valid SSL certificates. 
+
+[code]
+----
+mkdir ~/vccerts
+cd ~/vccerts
+wget --no-check-certificate https://vcsa.pietersmalan.com/certs/download.zip
+sudo dnf install unzip -y
+unzip download.zip
+sudo cp certs/lin/* /etc/pki/ca-trust/source/anchors
+sudo update-ca-trust extract
+
+----
+=== Create ssh key
+[note]
+Only required if you want to access OpenShift nodes through ssh, in case of troubleshooting 
+[code]
+----
+ssh-keygen
+----
+=== Create Manifests
+. Create a seperate directory to host our configuration information, and in the end the cluster authentication details. 
+[code]
+----
+mkdir ~/openshift
+cd ~/openshift
+
+----
+[start=2]
+. Create install-config.yaml
+[code]
+----
+openshift-install create install-config
+----
+[note]
+Supply all the answers as per usual install.
+
+Sample:
+[code]
+----
+[openshift@bastion openshift]$ openshift-install create install-config
+? SSH Public Key /home/openshift/.ssh/id_rsa.pub
+? Platform vsphere
+? vCenter vcsa.pietersmalan.com
+? Username administrator@pietersmalan.com
+? Password [? for help] ********
+INFO Connecting to vCenter vcsa.pietersmalan.com  
+INFO Defaulting to only available datacenter: Datacenter 
+INFO Defaulting to only available cluster: Cluster 
+INFO Defaulting to only available datastore: nvme 
+INFO Defaulting to only available network: VM Network 
+? Virtual IP Address for API 192.168.89.5
+? Virtual IP Address for Ingress 192.168.89.6
+? Base Domain pietersmalan.com
+? Cluster Name os
+? Pull Secret [? for help] ************
+....
+INFO Install-Config created in: .
+----
+
+[start=3]
+. Modify install-config.yaml to point to mirror repository
+
+Edit install-config.yaml and add the *imageContentSourcePolicy* as captured during the mirroring process, by concatenating all the mirrors (everything under *repositoryDigestMirrors:* tags in *imageContentSourcePolicy.yaml), and make sure to change the NetworkType to OVNKubernetes from OpenShiftSDN:
+
+[code]
+----
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes 
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  vsphere:
+    apiVIP: 192.168.89.5
+    cluster: Cluster
+    datacenter: Datacenter
+    defaultDatastore: nvme
+    ingressVIP: 192.168.89.6
+    network: VM Network
+    username: administrator@pietersmalan.com
+    vCenter: vcsa.pietersmalan.com
+publish: External
+pullSecret: '{"auths":
+....
+imageContentSources:
+- mirrors:
+  - bastion.pietersmalan.com:8443/ubi8
+  source: registry.redhat.io/ubi8
+- mirrors:
+  - bastion.pietersmalan.com:8443/openshift4-wincw
+  source: registry.redhat.io/openshift4-wincw
+- mirrors:
+  - bastion.pietersmalan.com:8443/redhat
+  source: registry.redhat.io/redhat
+- mirrors:
+  - bastion.pietersmalan.com:8443/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
+- mirrors:
+  - bastion.pietersmalan.com:8443/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+----
+
+[start=4]
+. Creating the Kubernetes Manifests
+
+WARNING: Make a backup of your install-config.yaml, outside of the working directory, as the install-config.yaml will be consumed when creating the manifests.
+
+[code]
+----
+cd ~/openshift
+cp install-config.yaml ..
+openshift-install create manifests
+----
+
+The output from above command:
+[code]
+----
+INFO Consuming Install Config from target directory 
+INFO Manifests created in: manifests and openshift 
+----
+
+== Setup OVNKubernetes Hybrid Networking
+. Create the network configuration manifest
+[code]
+----
+cd ~/openshift
+vi manifests/cluster-network-03-config.yaml
+----
+
+Add the following content, keeping in mind that you might have to change the cidr subnet value, if overlapping with existing network environment.
+[code]
+----
+apiVersion: operator.openshift.io/v1
+kind: Network
+metadata:
+  creationTimestamp: null
+  name: cluster
+spec:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  externalIP:
+    policy: {}
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+  defaultNetwork:
+    type: OVNKubernetes
+    ovnKubernetesConfig:
+      hybridOverlayConfig:
+        hybridClusterNetwork:
+        - cidr: 10.132.0.0/14
+          hostPrefix: 23
+        # Not supported with Windows 2019 LTSC
+        hybridOverlayVXLANPort: 9898
+----
+
+Copy the imageContentSourcePolicy and catalogSource-redhat-operator-index to manifests, using the results directory captured int mirroring process:
+
+[code]
+----
+cd ~/openshift
+cp /home/openshift/mirror/oc-mirror-workspace/results-1667285694/*.yaml openshift
+----
+
+== Slip Stream the WMCO Operator
+
+We can slip stream the WMCO Operator into the setup.
+
+Files are available under manifests in repository.
+
+. Create namespace for WMCO
+[code]
+----
+cd ~/openshift
+vi openshift/wmco-01-namespace.yaml
+----
+
+Insert the following code:
+
+[code]
+----
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-windows-machine-config-operator 
+  labels:
+    openshift.io/cluster-monitoring: "true" 
+----
+
+[start=2]
+. Create Operator Group for WMCO
+[code]
+----
+cd ~/openshift
+vi openshift/wmco-02-og.yaml
+----
+
+Insert the following code:
+
+[code]
+----
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: windows-machine-config-operator
+  namespace: openshift-windows-machine-config-operator
+spec:
+  targetNamespaces:
+  - openshift-windows-machine-config-operator
+----
+
+[start=3]
+. Create WCMO Subscription
+
+[code]
+----
+cd ~/openshift
+vi openshift/wmco-03-sub.yaml
+----
+
+Insert the following code:
+
+[code]
+----
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: windows-machine-config-operator
+  namespace: openshift-windows-machine-config-operator
+spec:
+  channel: "stable" 
+  installPlanApproval: "Automatic" 
+  name: "windows-machine-config-operator"
+  source: "redhat-operators" 
+  sourceNamespace: "openshift-marketplace" 
+----
+
+Disable non- relevant operators in OperatorHub:
+
+[code]
+----
+cd ~/openshift
+vi openshift/disable-operatos.yaml
+----
+
+With the contents:
+[code]
+----
+apiVersion: config.openshift.io/v1
+kind: OperatorHub
+metadata:
+  annotations:
+    capability.openshift.io/name: marketplace
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+    release.openshift.io/create-only: "true"
+  name: cluster
+spec:
+  sources:
+  - disabled: true
+    name: openshift-marketplace
+  - disabled: true
+    name: community-operators
+  - disabled: true
+    name: redhat-marketplace
+  - disabled: false
+    name: redhat-operators
+  - disabled: true
+    name: certified-operators
+
+----
+
+== Enable image tags for ImageContentSourcePolicy
+
+At the moment, using image tags for ImageContentSourcePolicy resource is not supported. In order for the operators to work, we need to enable pulling using image tags. This is achieved by adding a registries.conf, in /etc/container/registries.conf.d:
+
+[code]
+----
+cd
+vi my_registry.conf
+----
+
+Copy the registries entries assembled, for install-config.yaml, as a reference:
+
+[code]
+----
+[[registry]]
+  prefix = ""
+  location = "quay.io/openshift-release-dev/ocp-release"
+ 
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/openshift/release-images"
+
+[[registry]]
+  prefix = ""
+  location = "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+ 
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/openshift/release"
+
+[[registry]]
+  prefix = ""
+  location = "registry.redhat.io/openshift4-wincw"
+ 
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/openshift4-wincw"
+
+[[registry]]
+  prefix = ""
+  location = "registry.redhat.io/redhat"
+ 
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/redhat"
+
+[[registry]]
+  prefix = ""
+  location = "registry.redhat.io/ubi8"
+ 
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/ubi8"
+----
+
+[code]
+----
+base64 -w0 my_registry.conf
+----
+
+[code]
+----
+cd ~/openshift
+vi openshift/override-mirror-registries-master.yaml
+----
+
+With the contents:
+
+[code]
+----
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 99-master-override-registries
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+      - contents:
+          compression: ""
+          source: data:text/plain;charset=utf-8;base64,<base64 -w0 my_registry.conf>
+        mode: 420
+        overwrite: true
+        path: /etc/containers/registries.conf.d/99-master-mirror-by-digest-registries.conf
+----
+
+[code]
+----
+cd ~/openshift
+vi openshift/override-mirror-registries-worker.yaml
+----
+
+With the contents:
+
+[code]
+----
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-worker-override-registries
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+      - contents:
+          compression: ""
+          source: data:text/plain;charset=utf-8;base64,<base64 -w0 my_registry.conf>
+        mode: 420
+        overwrite: true
+        path: /etc/containers/registries.conf.d/99-worker-mirror-by-digest-registries.conf
+
+----
+= Creating Cluster
+
+Create the OpenShift Cluster
+
+[code]
+----
+openshift-install create cluster
+----
+
+Approve any outstanding Certificate Signing Requests
+[code]
+----
+oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs oc adm certificate approve
+----
+
+= Windows Configuration 
+
+== Windows Node preparation
+
+Standard Windows 2022 Install, connected to internet.
+
+Install VMWare Tools, from vSphere console.
+
+On the Windows Node in *Powershell*, as administrator:
+
+Download the wmco Windows scripts:
+[code]
+----
+Invoke-WebRequest -O configure-vm-tools.ps1 https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/vsphere_ci/scripts/configure-vm-tools.ps1
+
+Invoke-WebRequest -O install-openssh.ps1 https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/vsphere_ci/scripts/install-openssh.ps1
+
+Invoke-WebRequest -O install-updates.ps1 https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/vsphere_ci/scripts/install-updates.ps1
+----
+
+Add exclude-nics in C:\ProgramData\VMware\VMware Tools
+[code]
+----
+.\configure-vm-tools.ps1
+----
+
+Install OpenSSL, and ssh key:
+
+[code]
+----
+ssh-keygen -t ed25519
+----
+
+[code]
+----
+.\install-openssh.ps1 .\.ssh\id_ed25519.pub
+ Get-Service -Name "ssh*" | Select Name, Status, StartType 
+ Get-NetFirewallRule -DisplayName "*ssh*"
+ 
+----
+
+If firewall rule does not exist, as reported in last statement ran:
+[code]
+----
+New-NetFirewallRule -DisplayName 'OpenSSH Server (sshd)' -LocalPort 22 -Enabled True -Direction Inbound -Protocol TCP -Action Allow 
+----
+
+Create a firewall rule for metrics:
+
+[code]
+----
+New-NetFirewallRule -DisplayName "ContainerLogsPort" -LocalPort 10250 -Enabled True -Direction Inbound -Protocol TCP -Action Allow -EdgeTraversalPolicy Allow
+----
+
+Install updates:
+[code]
+----
+ ./install-updates.ps1
+----
+
+WARNING: It is not stated, but you might have to reboot a couple of times.
+
+== Tests Windows Node (Optional)
+
+Clone the Windows VM to a new VM.
+
+Using the new cloned Windows VM:
+
+Rename host:
+[code]
+----
+Rename-Computer -NewName "winbyoh" -Restart
+----
+
+Login and capture the private key from Windows node:
+[code]
+----
+more .\.ssh\id_ed25519
+----
+
+Back on the installer machine, using the id_ed25519 we have captured from Windows node, create a file private-key.pem:
+
+[code]
+----
+cd
+vi private-key.pem
+----
+
+[code]
+----
+export KUBECONFIG=~/openshift/auth/kubeconfig
+oc create secret generic cloud-private-key --from-file=private-key.pem=private-key.pem -n openshift-windows-machine-config-operator
+----
+
+Regsiter the Windows node, replace WINDOWSNODE_FQDN_OR_IP with Windows node ip, or fully qualified hostname: 
+
+[code]
+----
+cat <<EOF > winnode.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: windows-instances
+  namespace: openshift-windows-machine-config-operator
+data:
+  WINDOWSNODE_FQDN_OR_IP: |-
+    username=Administrator
+EOF
+----
+
+[code]
+----
+oc create -f winnode.yaml
+----
+
+== Create Gold Image
+
+Login and capture the private key from Windows node:
+[code]
+----
+more .\.ssh\id_ed25519
+----
+
+Back on the installer machine, using the id_ed25519 contents we have captured from Windows node, create a file private-key.pem:
+
+[code]
+----
+cd
+vi private-key.pem
+----
+
+[code]
+----
+export KUBECONFIG=~/openshift/auth/kubeconfig
+oc create secret generic cloud-private-key --from-file=private-key.pem=private-key.pem -n openshift-windows-machine-config-operator
+----
+
+Get a sample of the unattend.xml, and adopt accordingly:
+[code]
+----
+Invoke-WebRequest -O unattend.xml https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/unattend.xml
+
+more unattend.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!--A sample unattend.xml which helps in setting admin password and running scripts on first boot-->
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+   <settings pass="specialize">
+      <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+         <InputLocale>0409:00000409</InputLocale>
+         <SystemLocale>en-US</SystemLocale>
+         <UILanguage>en-US</UILanguage>
+         <UILanguageFallback>en-US</UILanguageFallback>
+         <UserLocale>en-US</UserLocale>
+      </component>
+      <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+         <SkipAutoActivation>true</SkipAutoActivation>
+      </component>
+      <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+         <CEIPEnabled>0</CEIPEnabled>
+      </component>
+      <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+         <ComputerName>winnode</ComputerName>
+      </component>
+   </settings>
+   <settings pass="oobeSystem">
+      <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+         <AutoLogon>
+            <!-- Disable automatic logon to avoid the security issue of leaving an open terminal with Administrator
+            privileges at boot. This is the default value and should not be changed. -->
+            <Enabled>false</Enabled>
+         </AutoLogon>
+         <OOBE>
+            <HideEULAPage>true</HideEULAPage>
+            <HideLocalAccountScreen>true</HideLocalAccountScreen>
+            <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+            <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+            <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+            <NetworkLocation>Work</NetworkLocation>
+            <ProtectYourPC>1</ProtectYourPC>
+            <SkipMachineOOBE>true</SkipMachineOOBE>
+            <SkipUserOOBE>true</SkipUserOOBE>
+         </OOBE>
+         <RegisteredOrganization>Organization</RegisteredOrganization>
+         <RegisteredOwner>Owner</RegisteredOwner>
+         <DisableAutoDaylightTimeSet>false</DisableAutoDaylightTimeSet>
+         <TimeZone>Eastern Standard Time</TimeZone>
+         <UserAccounts>
+            <!-- Prevents the built-in Administrator account from having a blank password by default. -->
+            <AdministratorPassword>
+                <!-- Replace the `MyPassword` placeholder with the password for the Administrator account -->
+               <Value>MyPassword</Value>
+               <PlainText>true</PlainText>
+            </AdministratorPassword>
+         </UserAccounts>
+      </component>
+   </settings>
+</unattend>
+----
+
+Since you can only run the *sysprep* utility a limited times, it is a good idea to make a clone before continuing.
+
+Run the sysprep utility:
+[code]
+----
+C:\Windows\System32\Sysprep\sysprep.exe /generalize /oobe /shutdown /unattend:unattend.xml
+----
+
+Once the sysprep command completes the Windows virtual machine will power off.
+
+You must not use or power on this virtual machine anymore.
+
+Convert virtual machine into template.
+
+Creating the machine set:
+
+Using the existing worker machine set as an example to fill in the required values:
+[code]
+-----
+oc get machineset -A
+
+NAMESPACE               NAME              DESIRED   CURRENT   READY   AVAILABLE   AGE
+openshift-machine-api   do-q9fvp-worker   3         3         3       3           24h
+
+
+oc get MachineSet/do-q9fvp-worker -n openshift-machine-api -o jsonpath='{.spec}{"\n"}'
+
+{"replicas":3,"selector":{"matchLabels":{"machine.openshift.io/cluster-api-cluster":"do-q9fvp","machine.openshift.io/cluster-api-machineset":"do-q9fvp-worker"}},"template":{"metadata":{"labels":{"machine.openshift.io/cluster-api-cluster":"do-q9fvp","machine.openshift.io/cluster-api-machine-role":"worker","machine.openshift.io/cluster-api-machine-type":"worker","machine.openshift.io/cluster-api-machineset":"do-q9fvp-worker"}},"spec":{"lifecycleHooks":{},"metadata":{},"providerSpec":{"value":{"apiVersion":"machine.openshift.io/v1beta1","credentialsSecret":{"name":"vsphere-cloud-credentials"},"diskGiB":120,"kind":"VSphereMachineProviderSpec","memoryMiB":16384,"metadata":{"creationTimestamp":null},"network":{"devices":[{"networkName":"Disconected VM"}]},"numCPUs":4,"numCoresPerSocket":4,"snapshot":"","template":"do-q9fvp-rhcos","userDataSecret":{"name":"worker-user-data"},"workspace":{"datacenter":"Datacenter","datastore":"Datastore","folder":"/Datacenter/vm/do-q9fvp","resourcePool":"/Datacenter/host/Cluster/Resources","server":"vcsa.pietersmalan.com"}}}}}}
+
+----
+
+[code]
+----
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: <infrastructure_id> 
+  name: <windows_machine_set_name> 
+  namespace: openshift-machine-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: <infrastructure_id> 
+      machine.openshift.io/cluster-api-machineset: <windows_machine_set_name> 
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: <infrastructure_id> 
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: <windows_machine_set_name> 
+        machine.openshift.io/os-id: Windows 
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/worker: "" 
+      providerSpec:
+        value:
+          apiVersion: vsphereprovider.openshift.io/v1beta1
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 128 
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 16384
+          network:
+            devices:
+            - networkName: "<vm_network_name>" 
+          numCPUs: 4
+          numCoresPerSocket: 1
+          snapshot: ""
+          template: <windows_vm_template_name> 
+          userDataSecret:
+            name: windows-user-data 
+          workspace:
+             datacenter: <vcenter_datacenter_name> 
+             datastore: <vcenter_datastore_name> 
+             folder: <vcenter_vm_folder_path> 
+             resourcePool: <vsphere_resource_pool> 
+             server: <vcenter_server_ip> 
+----
