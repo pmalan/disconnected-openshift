@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="author" content="Pieter Malan">
+<title>Disconected Openshift</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment the following line when using as a custom stylesheet */
+/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+html{font-family:sans-serif;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+b,strong{font-weight:bold}
+abbr{font-size:.9em}
+abbr[title]{cursor:help;border-bottom:1px dotted #dddddf;text-decoration:none}
+dfn{font-style:italic}
+hr{height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type=checkbox],input[type=radio]{padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,::before,::after{box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;line-height:1;position:relative;cursor:auto;-moz-tab-size:4;-o-tab-size:4;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:1px solid #dedede;word-wrap:normal}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre).nobreak{word-wrap:normal}
+:not(pre).nowrap{white-space:nowrap}
+:not(pre).pre-wrap{white-space:pre-wrap}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;border-radius:3px;box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 0 0 .1em #fff;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin:0 auto;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:flex;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border:1px solid #e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:none;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:hsla(0,0%,100%,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details{margin-left:1.25rem}
+details>summary{cursor:pointer;display:block;position:relative;line-height:1.6;margin-bottom:.625rem;outline:none;-webkit-tap-highlight-color:transparent}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"";border:solid transparent;border-left:solid;border-width:.3em 0 .3em .5em;position:absolute;top:.5em;left:-1.25rem;transform:translateX(15%)}
+details[open]>summary::before{border:solid transparent;border-top:solid;border-width:.5em .3em 0;transform:translateY(15%)}
+details>summary::after{content:"";width:1.25rem;height:1em;position:absolute;top:.3em;left:-1.25rem}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class=paragraph]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class=highlight],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos,pre.pygments .linenos{border-right:1px solid;opacity:.35;padding-right:.5em;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+pre.pygments span.linenos{display:inline-block;margin-right:.75em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;font-size:.85rem;text-align:left;margin-right:0}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content{margin-bottom:1.25em;word-wrap:anywhere}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>*>tr>*{border-width:1px}
+table.grid-cols>*>tr>*{border-width:0 1px}
+table.grid-rows>*>tr>*{border-width:1px 0}
+table.frame-all{border-width:1px}
+table.frame-ends{border-width:1px 0}
+table.frame-sides{border-width:0 1px}
+table.frame-none>colgroup+*>:first-child>*,table.frame-sides>colgroup+*>:first-child>*{border-top-width:0}
+table.frame-none>:last-child>:last-child>*,table.frame-sides>:last-child>:last-child>*{border-bottom-width:0}
+table.frame-none>*>tr>:first-child,table.frame-ends>*>tr>:first-child{border-left-width:0}
+table.frame-none>*>tr>:last-child,table.frame-ends>*>tr>:last-child{border-right-width:0}
+table.stripes-all>*>tr,table.stripes-odd>*>tr:nth-of-type(odd),table.stripes-even>*>tr:nth-of-type(even),table.stripes-hover>*>tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+li>p:empty:only-child::before{content:"";display:inline-block}
+ul.checklist>li>p:first-child{margin-left:-1em}
+ul.checklist>li>p:first-child>.fa-square-o:first-child,ul.checklist>li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist>li>p:first-child>input[type=checkbox]:first-child{margin-right:.25em}
+ul.inline{display:flex;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+td.hdlist2{word-wrap:anywhere}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:4px solid #fff;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt,summary{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]{border-bottom:1px dotted}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#header,#content,#footnotes,#footer{max-width:none}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media amzn-kf8,print{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="book data-line-1">
+<div id="header">
+<h1>Disconected Openshift</h1>
+<div class="details">
+<span id="author" class="author">Pieter Malan</span><br>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph data-line-31">
+<p><span class="image"><img src="images/pexels-simon-berger-1323550.jpeg" alt="pexels simon berger 1323550"></span>
+Photo by Simon Berger from Pexels - <a href="https://www.pexels.com/photo/silhouette-of-mountains-1323550/" class="undefined" data-href="https://www.pexels.com/photo/silhouette-of-mountains-1323550/">www.pexels.com/photo/silhouette-of-mountains-1323550/</a></p>
+</div>
+<!-- toc disabled -->
+</div>
+</div>
+<div class="sect1 data-line-37">
+<h2 id="_reasons_for_using_openshift_in_a_disconnected_environment">Reasons for using Openshift in a disconnected environment</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-39">
+<p>bla jkdlsfjskldjf</p>
+</div>
+</div>
+</div>
+<h1 id="_openshift_environment" class="sect0 data-line-41">Part I: Openshift Environment</h1>
+<div class="sect1 data-line-6">
+<h2 id="_access_to_vsphere">Chapter 1. Access to vSphere</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-8">
+<p>In order for machine config operator to interact with the vSphere API, we need to expose the endpoint to the Openshift nodes.</p>
+</div>
+<div class="paragraph data-line-10">
+<p>In vSphere, you can add a total of 4 network adapters on the appliance. Second adapter will be earmarked for VCHA, so if needed you have to add an additional adapter to configure.</p>
+</div>
+<div class="paragraph data-line-12">
+<p>Make sure that the hostname specified to access vCenter, resolves within the subnet as the ip address specified on the third adapter.</p>
+</div>
+<div class="admonitionblock note data-line-14">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+VMware VCSA 7 multiple network adapters <a href="https://4sysops.com/archives/vmware-vcsa-7-multiple-network-adapters/" class="undefined" data-href="https://4sysops.com/archives/vmware-vcsa-7-multiple-network-adapters/">4sysops.com/archives/vmware-vcsa-7-multiple-network-adapters/</a>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-16">
+<h2 id="_dns">Chapter 2. DNS</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-17">
+<p>On a node, with a fixed ip in the disconnected network, install dns. In this example 10.0.0.2.</p>
+</div>
+<div class="paragraph data-line-19">
+<p>As root install dnsmasq</p>
+</div>
+<div class="listingblock data-line-21">
+<div class="content">
+<pre>dnf install -y dnsmasq</pre>
+</div>
+</div>
+<div class="paragraph data-line-25">
+<p>Create /etc/dnsmasq.d/openshift-4.conf, where 10.0.0.6 is our apps wildcard, and "do" is our cluster name (disconnected "OpenShift").</p>
+</div>
+<div class="listingblock data-line-28">
+<div class="content">
+<pre>strict-order
+domain=pl.pietersmalan.com
+expand-hosts
+server=10.0.0.2
+interface=ens224
+address=/apps.do.pl.pietersmalan.com/10.0.0.6
+addn-hosts=/etc/dnsmasq-openshift-4.addnhosts</pre>
+</div>
+</div>
+<div class="paragraph data-line-38">
+<p>Add the dns entries for OpenShift, .5 for API, and the vSphere ip from previous step:</p>
+</div>
+<div class="paragraph data-line-40">
+<p>/etc/dnsmasq-openshift-4.addnhosts</p>
+</div>
+<div class="listingblock data-line-42">
+<div class="content">
+<pre>10.0.0.5 api.do.pl.pietersmalan.com api-int.do.pl.pietersmalan.com
+10.0.0.2 bastion.pietersmalan.com bastion.pl.pietersmalan.com
+10.0.0.250 vcsa.pietersmalan.com</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-49">
+<h2 id="_dhcp">Chapter 3. DHCP</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-50">
+<p>DHCP is required.</p>
+</div>
+<div class="listingblock data-line-53">
+<div class="content">
+<pre>dnf -y install dhcp-server</pre>
+</div>
+</div>
+<div class="listingblock data-line-58">
+<div class="content">
+<pre>vi /etc/dhcp/dhcpd.conf</pre>
+</div>
+</div>
+<div class="listingblock data-line-63">
+<div class="content">
+<pre>#
+# DHCP Server Configuration file.
+#   see /usr/share/doc/dhcp-server/dhcpd.conf.example
+#   see dhcpd.conf(5) man page
+#
+# Set DNS name and DNS server's IP address or hostname
+DHCPDARGS="ens224";
+option domain-name     "pl.pietersmalan.com";
+option domain-name-servers 10.0.0.2;
+
+# Declare DHCP Server
+authoritative;
+
+# The default DHCP lease time
+default-lease-time 600;
+
+# Set the maximum lease time
+max-lease-time 7200;
+
+# Set Network address, subnet mask and gateway
+
+subnet 10.0.0.0 netmask 255.255.255.0 {
+    # Range of IP addresses to allocate
+    range dynamic-bootp 10.0.0.10 10.0.0.200;
+    # Provide broadcast address
+    option broadcast-address 10.0.0.255;
+    # Set default gateway
+    option routers 10.0.0.1;
+}</pre>
+</div>
+</div>
+<div class="listingblock data-line-96">
+<div class="content">
+<pre>systemctl enable --now dhcpd</pre>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<div class="sect2 data-line-47">
+<h3 id="_setup_quay_mirror_registry">3.1. Setup Quay Mirror Registry</h3>
+<div class="olist arabic data-line-49">
+<ol class="arabic">
+<li class="data-line-49">
+<p>Download Quay Mirror Registry - <a href="https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz" class="undefined" data-href="https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz">developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz</a></p>
+</li>
+<li class="data-line-50">
+<p>Get a signed certificate, a wild card cert does work.</p>
+</li>
+<li class="data-line-51">
+<p>Prepare a user on target machine to host Quay</p>
+<div class="olist loweralpha data-line-52">
+<ol class="loweralpha" type="a">
+<li class="data-line-52">
+<p>Make sure the user has sudo priviledges (visudo + wheel group)</p>
+</li>
+<li class="data-line-53">
+<p>As the user do the following:</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-55">
+<div class="content">
+<pre>ssh-keygen
+ssh-copy-id quayhostname
+sudo ./mirror-registry install --initUser quay --initPassword quayquay --quayHostname quayhostname --sslCert cert.pem --sslKey privkey.pem</pre>
+</div>
+</div>
+<div class="olist arabic data-line-61">
+<ol class="arabic" start="4">
+<li class="data-line-61">
+<p>Open firewall port for Quay, if firewall is in use</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-63">
+<div class="content">
+<pre>sudo firewall-cmd --add-port=8443/tcp --zone=public --permanent
+sudo firewall-cmd --reload</pre>
+</div>
+</div>
+<div class="sect3 data-line-68">
+<h4 id="_setup_mirror_process">3.1.1. Setup Mirror process</h4>
+<div class="admonitionblock note data-line-69">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It is assumed that the mirror registry has access to the internet and the target private subnet where Openshift will be installed. If not the mirror process should be done with an export to a tar file, then imported into the mirror registry in the private subnet, using a copy the tar file. See <a href="https://docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#mirroring-image-set-full" class="undefined" data-href="https://docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#mirroring-image-set-full">docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#mirroring-image-set-full</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic data-line-71">
+<ol class="arabic">
+<li class="data-line-71">
+<p>Download the Openshift Installer, client and mirror plugin:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-74">
+<div class="content">
+<pre>mkdir ~/bin
+cd ~/bin
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-install-linux.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/oc-mirror.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz
+tar xvf openshift-client-linux.tar.gz
+tar xvf openshift-install-linux.tar.gz
+tar xvf oc-mirror.tar.gz</pre>
+</div>
+</div>
+<div class="olist arabic data-line-86">
+<ol class="arabic" start="2">
+<li class="data-line-86">
+<p>Configure security for pulling and pushing images:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-88">
+<div class="content">
+<pre>mkdir ~/mirror
+cd ~/mirror
+&lt;put your pullsecret copied form https://console.redhat.com/openshift/downloads in a file called pull-secret&gt;
+cat ./pull-secret | jq . &gt; pull-secret.json</pre>
+</div>
+</div>
+<div class="paragraph data-line-96">
+<p>Append to the list of auths in the pull-secret.json, the local mirror registry credentails. The credentials can be generated through the Quay web site, as a logged in user - <a href="https://quayhostname:8443/user/quay?tab=settings" class="undefined" data-href="https://quayhostname:8443/user/quay?tab=settings">quayhostname:8443/user/quay?tab=settings</a>, <strong>Generate Encrypted Password</strong>, then after entering password, <strong>Docker Configuration</strong> &gt; View quay-auth.json :</p>
+</div>
+<div class="listingblock data-line-99">
+<div class="content">
+<pre>      "auths": {
+        "&lt;mirror_registry&gt;": {
+          "auth": "&lt;credentials&gt;",
+          "email": "you@example.com"
+      },</pre>
+</div>
+</div>
+<div class="olist arabic data-line-107">
+<ol class="arabic" start="3">
+<li class="data-line-107">
+<p>"Authenticate" against registry, to allow <strong>oc mirror</strong> access to all our registries involved:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-110">
+<div class="content">
+<pre>mkdir ~/.docker
+cp pull-secret.json ~/.docker/config.json</pre>
+</div>
+</div>
+<div class="paragraph data-line-115">
+<p>An alternative to the above step, to log into all registries, as defined in pull-secret.json:</p>
+</div>
+<div class="exampleblock data-line-118">
+<div class="content">
+Dale Bewley - <a href="https://gist.github.com/dlbewley/ae1d678300db47cfcee8ec141385eb22" class="undefined" data-href="https://gist.github.com/dlbewley/ae1d678300db47cfcee8ec141385eb22">gist.github.com/dlbewley/ae1d678300db47cfcee8ec141385eb22</a>
+</div>
+</div>
+<div class="listingblock data-line-121">
+<div class="content">
+<pre>PULL_SECRET_PATH=pull-secret.json
+for R in $(cat $PULL_SECRET_PATH | jq -r '.auths|keys[]'); do
+  echo "Logging into $R";
+  U=$(jq -r ".auths.\"$R\".auth" $PULL_SECRET_PATH | base64 -d | awk -F: '{print $1}')
+  P=$(jq -r ".auths.\"$R\".auth" $PULL_SECRET_PATH | base64 -d | awk -F: '{print $2}')
+  podman login -u $U -p $P $R
+done</pre>
+</div>
+</div>
+<div class="olist arabic data-line-131">
+<ol class="arabic">
+<li class="data-line-131">
+<p>Optional, check the availability of wmco in release 4.11, and the operator name, then query the available versions for operator:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-133">
+<div class="content">
+<pre>oc-mirror list operators --catalog registry.redhat.io/redhat/redhat-operator-index:v4.11|grep windows
+windows-machine-config-operator               Windows Machine Config Operator   stable
+
+oc-mirror list operators --package windows-machine-config-operator --catalog registry.redhat.io/redhat/redhat-operator-index:v4.11
+PACKAGE                          CHANNEL  HEAD
+windows-machine-config-operator  preview  windows-machine-config-operator.v6.0.0
+windows-machine-config-operator  stable   windows-machine-config-operator.v6.0.0</pre>
+</div>
+</div>
+<div class="olist arabic data-line-144">
+<ol class="arabic" start="4">
+<li class="data-line-144">
+<p>Create a template to start with, or copy the sample:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-146">
+<div class="content">
+<pre>oc-mirror init --registry quayhost:8443/mirror/oc-mirror-metadata &gt; imageset-config.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-150">
+<p>Modified contents of imageset-config.yaml, notice the imageURL, produced by the command above with required operators section added for wmco.</p>
+</div>
+<div class="listingblock data-line-153">
+<div class="content">
+<pre>kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+storageConfig:
+  registry:
+    imageURL: bastion.pietersmalan.com:8443/mirror/oc-mirror-metdata
+    skipTLS: false
+mirror:
+  platform:
+    architectures:
+    - amd64
+    channels:
+    - name: stable-4.11
+      minVersion: 4.11.9
+      maxVersion: 4.11.9
+      type: ocp
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.11
+    packages:
+    - name: windows-machine-config-operator
+      channels:
+      - name: stable
+  additionalImages:
+    - name: registry.redhat.io/ubi8/ubi:latest
+    - name: registry.redhat.io/redhat/redhat-operator-index:v4.11</pre>
+</div>
+</div>
+<div class="admonitionblock note data-line-181">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For additional configuration, for example min/max version definitions etc, see <a href="https://docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#oc-mirror-imageset-config-params_installing-mirroring-disconnected" class="undefined" data-href="https://docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#oc-mirror-imageset-config-params_installing-mirroring-disconnected">docs.openshift.com/container-platform/4.11/installing/disconnected_install/installing-mirroring-disconnected.html#oc-mirror-imageset-config-params_installing-mirroring-disconnected</a>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic data-line-183">
+<ol class="arabic" start="5">
+<li class="data-line-183">
+<p>Start the mirror proces:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-185">
+<div class="content">
+<pre>oc-mirror --config=./imageset-config.yaml docker://bastion.pietersmalan.com:8443</pre>
+</div>
+</div>
+<div class="paragraph data-line-189">
+<p>The output would be similar to the following:</p>
+</div>
+<div class="listingblock data-line-191">
+<div class="content">
+<pre>Checking push permissions for bastion.pietersmalan.com:8443
+Creating directory: oc-mirror-workspace/src/publish
+Creating directory: oc-mirror-workspace/src/v2
+Creating directory: oc-mirror-workspace/src/charts
+Creating directory: oc-mirror-workspace/src/release-signatures
+No metadata detected, creating new workspace
+wrote mirroring manifests to oc-mirror-workspace/operators.1667285372/manifests-redhat-operator-index
+
+To upload local images to a registry, run:
+
+	oc adm catalog mirror file://redhat/redhat-operator-index:v4.11 REGISTRY/REPOSITORY
+bastion.pietersmalan.com:8443/
+  openshift/release
+    blobs:
+      quay.io/openshift-release-dev/ocp-v4.0-art-dev sha256:d8190195889efb5333eeec18af9b6c82313edd4db62989bd3a357caca4f13f0e 1.404KiB
+      quay.io/openshift-release-dev/ocp-v4.0-art-dev sha256:53525f8b521a5f9317c9ce853653e176e9ed1037575ae7f5da2a2bed6a450060 1.804KiB
+      quay.io/openshift-release-dev/ocp-v4.0-art-dev sha256:17a7d9dcb5c2145df3d0adae108e5bfb9880760459672b1502bc363466740455 2.047KiB
+.....
+ manifests:
+      sha256:94b611f00f51c9acc44ca3f4634e46bd79d7d28b46047c7e3389d250698f0c99 -&gt; 4.11.9-x86_64
+  openshift4-wincw/windows-machine-config-operator-bundle
+    blobs:
+      registry.redhat.io/openshift4-wincw/windows-machine-config-operator-bundle sha256:792a6efb36636881408b916f3b5c4ad22244bfba20619a6dc3fe76dba07de98c 4.984KiB
+      registry.redhat.io/openshift4-wincw/windows-machine-config-operator-bundle sha256:711db228ba0f794e7092f376ebe937957b50e53931f676996cc17a2cb3133533 10.67KiB
+    manifests:
+      sha256:17b5c18bacb38a2e4d0c3e53e166857af9c53f9e02dd0416b34974c1376f4f5e -&gt; 3bb4a030
+  openshift4-wincw/windows-machine-config-rhel8-operator
+......
+info: Mirroring completed in 3m26.03s (73.36MB/s)
+Rendering catalog image "bastion.pietersmalan.com:8443/redhat/redhat-operator-index:v4.11" with file-based catalog
+Writing image mapping to oc-mirror-workspace/results-1667285694/mapping.txt
+Writing CatalogSource manifests to oc-mirror-workspace/results-1667285694
+Writing ICSP manifests to oc-mirror-workspace/results-1667285694</pre>
+</div>
+</div>
+<div class="olist arabic data-line-228">
+<ol class="arabic" start="6">
+<li class="data-line-228">
+<p>Take not of the location of the  results directory :</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-230">
+<div class="content">
+<pre>cd oc-mirror-workspace/results-1667285694
+more mapping.txt
+pwd</pre>
+</div>
+</div>
+<div class="admonitionblock warning data-line-236">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+All the repositories in Quay will be created as "private", make sure to make them "public" through the Quay interface, before starting the OpenShift installer.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-238">
+<h2 id="_openshift_installation">Chapter 4. OpenShift Installation</h2>
+<div class="sectionbody">
+<div class="admonitionblock warning data-line-240">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Before runnnig the openshift-install command, compare the version numbers of the images as listed in the mapping.txt (/release:4.11.9-x86) file to the version of the openshift-install command, by executing <strong>openshift-install version</strong>. If not the same version, get the corresponding version of the openshift-install binary.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2 data-line-242">
+<h3 id="_install_vcenter_certificates">4.1. Install vCenter Certificates</h3>
+<div class="paragraph data-line-243">
+<p>NOTE:Only required if vCenter does not use valid SSL certificates.</p>
+</div>
+<div class="listingblock data-line-246">
+<div class="content">
+<pre>mkdir ~/vccerts
+cd ~/vccerts
+wget --no-check-certificate https://vcsa.pietersmalan.com/certs/download.zip
+sudo dnf install unzip -y
+unzip download.zip
+sudo cp certs/lin/* /etc/pki/ca-trust/source/anchors
+sudo update-ca-trust extract</pre>
+</div>
+</div>
+</div>
+<div class="sect2 data-line-256">
+<h3 id="_create_ssh_key">4.2. Create ssh key</h3>
+<div class="paragraph data-line-258">
+<p>Only required if you want to access OpenShift nodes through ssh, in case of troubleshooting</p>
+</div>
+<div class="listingblock data-line-260">
+<div class="content">
+<pre>ssh-keygen</pre>
+</div>
+</div>
+</div>
+<div class="sect2 data-line-263">
+<h3 id="_create_manifests">4.3. Create Manifests</h3>
+<div class="olist arabic data-line-264">
+<ol class="arabic">
+<li class="data-line-264">
+<p>Create a seperate directory to host our configuration information, and in the end the cluster authentication details.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-266">
+<div class="content">
+<pre>mkdir ~/openshift
+cd ~/openshift</pre>
+</div>
+</div>
+<div class="olist arabic data-line-272">
+<ol class="arabic" start="2">
+<li class="data-line-272">
+<p>Create install-config.yaml</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-274">
+<div class="content">
+<pre>openshift-install create install-config</pre>
+</div>
+</div>
+<div class="paragraph data-line-278">
+<p>Supply all the answers as per usual install.</p>
+</div>
+<div class="paragraph data-line-280">
+<p>Sample:</p>
+</div>
+<div class="listingblock data-line-282">
+<div class="content">
+<pre>[openshift@bastion openshift]$ openshift-install create install-config
+? SSH Public Key /home/openshift/.ssh/id_rsa.pub
+? Platform vsphere
+? vCenter vcsa.pietersmalan.com
+? Username administrator@pietersmalan.com
+? Password [? for help] ********
+INFO Connecting to vCenter vcsa.pietersmalan.com
+INFO Defaulting to only available datacenter: Datacenter
+INFO Defaulting to only available cluster: Cluster
+INFO Defaulting to only available datastore: nvme
+INFO Defaulting to only available network: VM Network
+? Virtual IP Address for API 192.168.89.5
+? Virtual IP Address for Ingress 192.168.89.6
+? Base Domain pietersmalan.com
+? Cluster Name os
+? Pull Secret [? for help] ************
+....
+INFO Install-Config created in: .</pre>
+</div>
+</div>
+<div class="olist arabic data-line-304">
+<ol class="arabic" start="3">
+<li class="data-line-304">
+<p>Modify install-config.yaml to point to mirror repository</p>
+</li>
+</ol>
+</div>
+<div class="paragraph data-line-306">
+<p>Edit install-config.yaml and add the <strong>imageContentSourcePolicy</strong> as captured during the mirroring process, by concatenating all the mirrors (everything under <strong>repositoryDigestMirrors:</strong> tags in *imageContentSourcePolicy.yaml), and make sure to change the NetworkType to OVNKubernetes from OpenShiftSDN:</p>
+</div>
+<div class="listingblock data-line-309">
+<div class="content">
+<pre>networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  vsphere:
+    apiVIP: 192.168.89.5
+    cluster: Cluster
+    datacenter: Datacenter
+    defaultDatastore: nvme
+    ingressVIP: 192.168.89.6
+    network: VM Network
+    username: administrator@pietersmalan.com
+    vCenter: vcsa.pietersmalan.com
+publish: External
+pullSecret: '{"auths":
+....
+imageContentSources:
+- mirrors:
+  - bastion.pietersmalan.com:8443/ubi8
+  source: registry.redhat.io/ubi8
+- mirrors:
+  - bastion.pietersmalan.com:8443/openshift4-wincw
+  source: registry.redhat.io/openshift4-wincw
+- mirrors:
+  - bastion.pietersmalan.com:8443/redhat
+  source: registry.redhat.io/redhat
+- mirrors:
+  - bastion.pietersmalan.com:8443/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
+- mirrors:
+  - bastion.pietersmalan.com:8443/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev</pre>
+</div>
+</div>
+<div class="olist arabic data-line-351">
+<ol class="arabic" start="4">
+<li class="data-line-351">
+<p>Creating the Kubernetes Manifests</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock warning data-line-353">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Make a backup of your install-config.yaml, outside of the working directory, as the install-config.yaml will be consumed when creating the manifests.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock data-line-356">
+<div class="content">
+<pre>cd ~/openshift
+cp install-config.yaml ..
+openshift-install create manifests</pre>
+</div>
+</div>
+<div class="paragraph data-line-362">
+<p>The output from above command:</p>
+</div>
+<div class="listingblock data-line-364">
+<div class="content">
+<pre>INFO Consuming Install Config from target directory
+INFO Manifests created in: manifests and openshift</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-369">
+<h2 id="_setup_ovnkubernetes_hybrid_networking">Chapter 5. Setup OVNKubernetes Hybrid Networking</h2>
+<div class="sectionbody">
+<div class="olist arabic data-line-370">
+<ol class="arabic">
+<li class="data-line-370">
+<p>Create the network configuration manifest</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-372">
+<div class="content">
+<pre>cd ~/openshift
+vi manifests/cluster-network-03-config.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-377">
+<p>Add the following content, keeping in mind that you might have to change the cidr subnet value, if overlapping with existing network environment.</p>
+</div>
+<div class="listingblock data-line-379">
+<div class="content">
+<pre>apiVersion: operator.openshift.io/v1
+kind: Network
+metadata:
+  creationTimestamp: null
+  name: cluster
+spec:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  externalIP:
+    policy: {}
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+  defaultNetwork:
+    type: OVNKubernetes
+    ovnKubernetesConfig:
+      hybridOverlayConfig:
+        hybridClusterNetwork:
+        - cidr: 10.132.0.0/14
+          hostPrefix: 23
+        # Not supported with Windows 2019 LTSC
+        hybridOverlayVXLANPort: 9898</pre>
+</div>
+</div>
+<div class="paragraph data-line-405">
+<p>Copy the imageContentSourcePolicy and catalogSource-redhat-operator-index to manifests, using the results directory captured int mirroring process:</p>
+</div>
+<div class="listingblock data-line-408">
+<div class="content">
+<pre>cd ~/openshift
+cp /home/openshift/mirror/oc-mirror-workspace/results-1667285694/*.yaml openshift</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-413">
+<h2 id="_slip_stream_the_wmco_operator">Chapter 6. Slip Stream the WMCO Operator</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-415">
+<p>We can slip stream the WMCO Operator into the setup.</p>
+</div>
+<div class="paragraph data-line-417">
+<p>Files are available under manifests in repository.</p>
+</div>
+<div class="olist arabic data-line-419">
+<ol class="arabic">
+<li class="data-line-419">
+<p>Create namespace for WMCO</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-421">
+<div class="content">
+<pre>cd ~/openshift
+vi openshift/wmco-01-namespace.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-426">
+<p>Insert the following code:</p>
+</div>
+<div class="listingblock data-line-429">
+<div class="content">
+<pre>apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-windows-machine-config-operator
+  labels:
+    openshift.io/cluster-monitoring: "true"</pre>
+</div>
+</div>
+<div class="olist arabic data-line-439">
+<ol class="arabic" start="2">
+<li class="data-line-439">
+<p>Create Operator Group for WMCO</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-441">
+<div class="content">
+<pre>cd ~/openshift
+vi openshift/wmco-02-og.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-446">
+<p>Insert the following code:</p>
+</div>
+<div class="listingblock data-line-449">
+<div class="content">
+<pre>apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: windows-machine-config-operator
+  namespace: openshift-windows-machine-config-operator
+spec:
+  targetNamespaces:
+  - openshift-windows-machine-config-operator</pre>
+</div>
+</div>
+<div class="olist arabic data-line-461">
+<ol class="arabic" start="3">
+<li class="data-line-461">
+<p>Create WCMO Subscription</p>
+</li>
+</ol>
+</div>
+<div class="listingblock data-line-464">
+<div class="content">
+<pre>cd ~/openshift
+vi openshift/wmco-03-sub.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-469">
+<p>Insert the following code:</p>
+</div>
+<div class="listingblock data-line-472">
+<div class="content">
+<pre>apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: windows-machine-config-operator
+  namespace: openshift-windows-machine-config-operator
+spec:
+  channel: "stable"
+  installPlanApproval: "Automatic"
+  name: "windows-machine-config-operator"
+  source: "redhat-operators"
+  sourceNamespace: "openshift-marketplace"</pre>
+</div>
+</div>
+<div class="paragraph data-line-486">
+<p>Disable non- relevant operators in OperatorHub:</p>
+</div>
+<div class="listingblock data-line-489">
+<div class="content">
+<pre>cd ~/openshift
+vi openshift/disable-operatos.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-494">
+<p>With the contents:</p>
+</div>
+<div class="listingblock data-line-496">
+<div class="content">
+<pre>apiVersion: config.openshift.io/v1
+kind: OperatorHub
+metadata:
+  annotations:
+    capability.openshift.io/name: marketplace
+    include.release.openshift.io/ibm-cloud-managed: "true"
+    include.release.openshift.io/self-managed-high-availability: "true"
+    include.release.openshift.io/single-node-developer: "true"
+    release.openshift.io/create-only: "true"
+  name: cluster
+spec:
+  sources:
+  - disabled: true
+    name: openshift-marketplace
+  - disabled: true
+    name: community-operators
+  - disabled: true
+    name: redhat-marketplace
+  - disabled: false
+    name: redhat-operators
+  - disabled: true
+    name: certified-operators</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-522">
+<h2 id="_enable_image_tags_for_imagecontentsourcepolicy">Chapter 7. Enable image tags for ImageContentSourcePolicy</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-524">
+<p>At the moment, using image tags for ImageContentSourcePolicy resource is not supported. In order for the operators to work, we need to enable pulling using image tags. This is achieved by adding a registries.conf, in /etc/container/registries.conf.d:</p>
+</div>
+<div class="listingblock data-line-527">
+<div class="content">
+<pre>cd
+vi my_registry.conf</pre>
+</div>
+</div>
+<div class="paragraph data-line-532">
+<p>Copy the registries entries assembled, for install-config.yaml, as a reference:</p>
+</div>
+<div class="listingblock data-line-535">
+<div class="content">
+<pre>[[registry]]
+  prefix = ""
+  location = "quay.io/openshift-release-dev/ocp-release"
+
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/openshift/release-images"
+
+[[registry]]
+  prefix = ""
+  location = "quay.io/openshift-release-dev/ocp-v4.0-art-dev"
+
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/openshift/release"
+
+[[registry]]
+  prefix = ""
+  location = "registry.redhat.io/openshift4-wincw"
+
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/openshift4-wincw"
+
+[[registry]]
+  prefix = ""
+  location = "registry.redhat.io/redhat"
+
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/redhat"
+
+[[registry]]
+  prefix = ""
+  location = "registry.redhat.io/ubi8"
+
+  [[registry.mirror]]
+    location = "bastion.pietersmalan.com:8443/ubi8"</pre>
+</div>
+</div>
+<div class="listingblock data-line-573">
+<div class="content">
+<pre>base64 -w0 my_registry.conf</pre>
+</div>
+</div>
+<div class="listingblock data-line-578">
+<div class="content">
+<pre>cd ~/openshift
+vi openshift/override-mirror-registries-master.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-583">
+<p>With the contents:</p>
+</div>
+<div class="listingblock data-line-586">
+<div class="content">
+<pre>apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 99-master-override-registries
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+      - contents:
+          compression: ""
+          source: data:text/plain;charset=utf-8;base64,&lt;base64 -w0 my_registry.conf&gt;
+        mode: 420
+        overwrite: true
+        path: /etc/containers/registries.conf.d/99-master-mirror-by-digest-registries.conf</pre>
+</div>
+</div>
+<div class="listingblock data-line-608">
+<div class="content">
+<pre>cd ~/openshift
+vi openshift/override-mirror-registries-worker.yaml</pre>
+</div>
+</div>
+<div class="paragraph data-line-613">
+<p>With the contents:</p>
+</div>
+<div class="listingblock data-line-616">
+<div class="content">
+<pre>apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-worker-override-registries
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      files:
+      - contents:
+          compression: ""
+          source: data:text/plain;charset=utf-8;base64,&lt;base64 -w0 my_registry.conf&gt;
+        mode: 420
+        overwrite: true
+        path: /etc/containers/registries.conf.d/99-worker-mirror-by-digest-registries.conf</pre>
+</div>
+</div>
+</div>
+</div>
+<h1 id="_creating_cluster" class="sect0 data-line-637">Part II: Creating Cluster</h1>
+<div class="openblock partintro">
+<div class="content">
+<div class="paragraph data-line-639">
+<p>Create the OpenShift Cluster</p>
+</div>
+<div class="listingblock data-line-642">
+<div class="content">
+<pre>openshift-install create cluster</pre>
+</div>
+</div>
+<div class="paragraph data-line-646">
+<p>Approve any outstanding Certificate Signing Requests</p>
+</div>
+<div class="listingblock data-line-648">
+<div class="content">
+<pre>oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs oc adm certificate approve</pre>
+</div>
+</div>
+</div>
+</div>
+<h1 id="_windows_configuration" class="sect0 data-line-652">Part III: Windows Configuration</h1>
+<div class="sect1 data-line-654">
+<h2 id="_windows_node_preparation">Chapter 8. Windows Node preparation</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-656">
+<p>Standard Windows 2022 Install, connected to internet.</p>
+</div>
+<div class="paragraph data-line-658">
+<p>Install VMWare Tools, from vSphere console.</p>
+</div>
+<div class="paragraph data-line-660">
+<p>On the Windows Node in <strong>Powershell</strong>, as administrator:</p>
+</div>
+<div class="paragraph data-line-662">
+<p>Download the wmco Windows scripts:</p>
+</div>
+<div class="listingblock data-line-664">
+<div class="content">
+<pre>Invoke-WebRequest -O configure-vm-tools.ps1 https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/vsphere_ci/scripts/configure-vm-tools.ps1
+
+Invoke-WebRequest -O install-openssh.ps1 https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/vsphere_ci/scripts/install-openssh.ps1
+
+Invoke-WebRequest -O install-updates.ps1 https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/vsphere_ci/scripts/install-updates.ps1</pre>
+</div>
+</div>
+<div class="paragraph data-line-672">
+<p>Add exclude-nics in C:\ProgramData\VMware\VMware Tools</p>
+</div>
+<div class="listingblock data-line-674">
+<div class="content">
+<pre>.\configure-vm-tools.ps1</pre>
+</div>
+</div>
+<div class="paragraph data-line-678">
+<p>Install OpenSSL, and ssh key:</p>
+</div>
+<div class="listingblock data-line-681">
+<div class="content">
+<pre>ssh-keygen -t ed25519</pre>
+</div>
+</div>
+<div class="listingblock data-line-686">
+<div class="content">
+<pre>.\install-openssh.ps1 .\.ssh\id_ed25519.pub
+ Get-Service -Name "ssh*" | Select Name, Status, StartType
+ Get-NetFirewallRule -DisplayName "*ssh*"</pre>
+</div>
+</div>
+<div class="paragraph data-line-693">
+<p>If firewall rule does not exist, as reported in last statement ran:</p>
+</div>
+<div class="listingblock data-line-695">
+<div class="content">
+<pre>New-NetFirewallRule -DisplayName 'OpenSSH Server (sshd)' -LocalPort 22 -Enabled True -Direction Inbound -Protocol TCP -Action Allow</pre>
+</div>
+</div>
+<div class="paragraph data-line-699">
+<p>Create a firewall rule for metrics:</p>
+</div>
+<div class="listingblock data-line-702">
+<div class="content">
+<pre>New-NetFirewallRule -DisplayName "ContainerLogsPort" -LocalPort 10250 -Enabled True -Direction Inbound -Protocol TCP -Action Allow -EdgeTraversalPolicy Allow</pre>
+</div>
+</div>
+<div class="paragraph data-line-706">
+<p>Install updates:</p>
+</div>
+<div class="listingblock data-line-708">
+<div class="content">
+<pre> ./install-updates.ps1</pre>
+</div>
+</div>
+<div class="admonitionblock warning data-line-712">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+It is not stated, but you might have to reboot a couple of times.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-714">
+<h2 id="_tests_windows_node_optional">Chapter 9. Tests Windows Node (Optional)</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-716">
+<p>Clone the Windows VM to a new VM.</p>
+</div>
+<div class="paragraph data-line-718">
+<p>Using the new cloned Windows VM:</p>
+</div>
+<div class="paragraph data-line-720">
+<p>Rename host:</p>
+</div>
+<div class="listingblock data-line-722">
+<div class="content">
+<pre>Rename-Computer -NewName "winbyoh" -Restart</pre>
+</div>
+</div>
+<div class="paragraph data-line-726">
+<p>Login and capture the private key from Windows node:</p>
+</div>
+<div class="listingblock data-line-728">
+<div class="content">
+<pre>more .\.ssh\id_ed25519</pre>
+</div>
+</div>
+<div class="paragraph data-line-732">
+<p>Back on the installer machine, using the id_ed25519 we have captured from Windows node, create a file private-key.pem:</p>
+</div>
+<div class="listingblock data-line-735">
+<div class="content">
+<pre>cd
+vi private-key.pem</pre>
+</div>
+</div>
+<div class="listingblock data-line-741">
+<div class="content">
+<pre>export KUBECONFIG=~/openshift/auth/kubeconfig
+oc create secret generic cloud-private-key --from-file=private-key.pem=private-key.pem -n openshift-windows-machine-config-operator</pre>
+</div>
+</div>
+<div class="paragraph data-line-746">
+<p>Regsiter the Windows node, replace WINDOWSNODE_FQDN_OR_IP with Windows node ip, or fully qualified hostname:</p>
+</div>
+<div class="listingblock data-line-749">
+<div class="content">
+<pre>cat &lt;&lt;EOF &gt; winnode.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: windows-instances
+  namespace: openshift-windows-machine-config-operator
+data:
+  WINDOWSNODE_FQDN_OR_IP: |-
+    username=Administrator
+EOF</pre>
+</div>
+</div>
+<div class="listingblock data-line-763">
+<div class="content">
+<pre>oc create -f winnode.yaml</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 data-line-767">
+<h2 id="_create_gold_image">Chapter 10. Create Gold Image</h2>
+<div class="sectionbody">
+<div class="paragraph data-line-769">
+<p>Login and capture the private key from Windows node:</p>
+</div>
+<div class="listingblock data-line-771">
+<div class="content">
+<pre>more .\.ssh\id_ed25519</pre>
+</div>
+</div>
+<div class="paragraph data-line-775">
+<p>Back on the installer machine, using the id_ed25519 contents we have captured from Windows node, create a file private-key.pem:</p>
+</div>
+<div class="listingblock data-line-778">
+<div class="content">
+<pre>cd
+vi private-key.pem</pre>
+</div>
+</div>
+<div class="listingblock data-line-784">
+<div class="content">
+<pre>export KUBECONFIG=~/openshift/auth/kubeconfig
+oc create secret generic cloud-private-key --from-file=private-key.pem=private-key.pem -n openshift-windows-machine-config-operator</pre>
+</div>
+</div>
+<div class="paragraph data-line-789">
+<p>Get a sample of the unattend.xml, and adopt accordingly:</p>
+</div>
+<div class="listingblock data-line-791">
+<div class="content">
+<pre>Invoke-WebRequest -O unattend.xml https://raw.githubusercontent.com/openshift/windows-machine-config-operator/release-4.11/docs/unattend.xml
+
+more unattend.xml
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!--A sample unattend.xml which helps in setting admin password and running scripts on first boot--&gt;
+&lt;unattend xmlns="urn:schemas-microsoft-com:unattend"&gt;
+   &lt;settings pass="specialize"&gt;
+      &lt;component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"&gt;
+         &lt;InputLocale&gt;0409:00000409&lt;/InputLocale&gt;
+         &lt;SystemLocale&gt;en-US&lt;/SystemLocale&gt;
+         &lt;UILanguage&gt;en-US&lt;/UILanguage&gt;
+         &lt;UILanguageFallback&gt;en-US&lt;/UILanguageFallback&gt;
+         &lt;UserLocale&gt;en-US&lt;/UserLocale&gt;
+      &lt;/component&gt;
+      &lt;component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"&gt;
+         &lt;SkipAutoActivation&gt;true&lt;/SkipAutoActivation&gt;
+      &lt;/component&gt;
+      &lt;component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"&gt;
+         &lt;CEIPEnabled&gt;0&lt;/CEIPEnabled&gt;
+      &lt;/component&gt;
+      &lt;component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"&gt;
+         &lt;ComputerName&gt;winnode&lt;/ComputerName&gt;
+      &lt;/component&gt;
+   &lt;/settings&gt;
+   &lt;settings pass="oobeSystem"&gt;
+      &lt;component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"&gt;
+         &lt;AutoLogon&gt;
+            &lt;!-- Disable automatic logon to avoid the security issue of leaving an open terminal with Administrator
+            privileges at boot. This is the default value and should not be changed. --&gt;
+            &lt;Enabled&gt;false&lt;/Enabled&gt;
+         &lt;/AutoLogon&gt;
+         &lt;OOBE&gt;
+            &lt;HideEULAPage&gt;true&lt;/HideEULAPage&gt;
+            &lt;HideLocalAccountScreen&gt;true&lt;/HideLocalAccountScreen&gt;
+            &lt;HideOEMRegistrationScreen&gt;true&lt;/HideOEMRegistrationScreen&gt;
+            &lt;HideOnlineAccountScreens&gt;true&lt;/HideOnlineAccountScreens&gt;
+            &lt;HideWirelessSetupInOOBE&gt;true&lt;/HideWirelessSetupInOOBE&gt;
+            &lt;NetworkLocation&gt;Work&lt;/NetworkLocation&gt;
+            &lt;ProtectYourPC&gt;1&lt;/ProtectYourPC&gt;
+            &lt;SkipMachineOOBE&gt;true&lt;/SkipMachineOOBE&gt;
+            &lt;SkipUserOOBE&gt;true&lt;/SkipUserOOBE&gt;
+         &lt;/OOBE&gt;
+         &lt;RegisteredOrganization&gt;Organization&lt;/RegisteredOrganization&gt;
+         &lt;RegisteredOwner&gt;Owner&lt;/RegisteredOwner&gt;
+         &lt;DisableAutoDaylightTimeSet&gt;false&lt;/DisableAutoDaylightTimeSet&gt;
+         &lt;TimeZone&gt;Eastern Standard Time&lt;/TimeZone&gt;
+         &lt;UserAccounts&gt;
+            &lt;!-- Prevents the built-in Administrator account from having a blank password by default. --&gt;
+            &lt;AdministratorPassword&gt;
+                &lt;!-- Replace the `MyPassword` placeholder with the password for the Administrator account --&gt;
+               &lt;Value&gt;MyPassword&lt;/Value&gt;
+               &lt;PlainText&gt;true&lt;/PlainText&gt;
+            &lt;/AdministratorPassword&gt;
+         &lt;/UserAccounts&gt;
+      &lt;/component&gt;
+   &lt;/settings&gt;
+&lt;/unattend&gt;</pre>
+</div>
+</div>
+<div class="paragraph data-line-851">
+<p>Since you can only run the <strong>sysprep</strong> utility a limited times, it is a good idea to make a clone before continuing.</p>
+</div>
+<div class="paragraph data-line-853">
+<p>Run the sysprep utility:</p>
+</div>
+<div class="listingblock data-line-855">
+<div class="content">
+<pre>C:\Windows\System32\Sysprep\sysprep.exe /generalize /oobe /shutdown /unattend:unattend.xml</pre>
+</div>
+</div>
+<div class="paragraph data-line-859">
+<p>Once the sysprep command completes the Windows virtual machine will power off.</p>
+</div>
+<div class="paragraph data-line-861">
+<p>You must not use or power on this virtual machine anymore.</p>
+</div>
+<div class="paragraph data-line-863">
+<p>Convert virtual machine into template.</p>
+</div>
+<div class="paragraph data-line-865">
+<p>Creating the machine set:</p>
+</div>
+<div class="paragraph data-line-867">
+<p>Using the existing worker machine set as an example to fill in the required values:</p>
+</div>
+<div class="listingblock data-line-869">
+<div class="content">
+<pre>oc get machineset -A
+
+NAMESPACE               NAME              DESIRED   CURRENT   READY   AVAILABLE   AGE
+openshift-machine-api   do-q9fvp-worker   3         3         3       3           24h
+
+
+oc get MachineSet/do-q9fvp-worker -n openshift-machine-api -o jsonpath='{.spec}{"\n"}'
+
+{"replicas":3,"selector":{"matchLabels":{"machine.openshift.io/cluster-api-cluster":"do-q9fvp","machine.openshift.io/cluster-api-machineset":"do-q9fvp-worker"}},"template":{"metadata":{"labels":{"machine.openshift.io/cluster-api-cluster":"do-q9fvp","machine.openshift.io/cluster-api-machine-role":"worker","machine.openshift.io/cluster-api-machine-type":"worker","machine.openshift.io/cluster-api-machineset":"do-q9fvp-worker"}},"spec":{"lifecycleHooks":{},"metadata":{},"providerSpec":{"value":{"apiVersion":"machine.openshift.io/v1beta1","credentialsSecret":{"name":"vsphere-cloud-credentials"},"diskGiB":120,"kind":"VSphereMachineProviderSpec","memoryMiB":16384,"metadata":{"creationTimestamp":null},"network":{"devices":[{"networkName":"Disconected VM"}]},"numCPUs":4,"numCoresPerSocket":4,"snapshot":"","template":"do-q9fvp-rhcos","userDataSecret":{"name":"worker-user-data"},"workspace":{"datacenter":"Datacenter","datastore":"Datastore","folder":"/Datacenter/vm/do-q9fvp","resourcePool":"/Datacenter/host/Cluster/Resources","server":"vcsa.pietersmalan.com"}}}}}}
+
+----
+
+[code]
+----
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: &lt;infrastructure_id&gt;
+  name: &lt;windows_machine_set_name&gt;
+  namespace: openshift-machine-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: &lt;infrastructure_id&gt;
+      machine.openshift.io/cluster-api-machineset: &lt;windows_machine_set_name&gt;
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: &lt;infrastructure_id&gt;
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: &lt;windows_machine_set_name&gt;
+        machine.openshift.io/os-id: Windows
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/worker: ""
+      providerSpec:
+        value:
+          apiVersion: vsphereprovider.openshift.io/v1beta1
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 128
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 16384
+          network:
+            devices:
+            - networkName: "&lt;vm_network_name&gt;"
+          numCPUs: 4
+          numCoresPerSocket: 1
+          snapshot: ""
+          template: &lt;windows_vm_template_name&gt;
+          userDataSecret:
+            name: windows-user-data
+          workspace:
+             datacenter: &lt;vcenter_datacenter_name&gt;
+             datastore: &lt;vcenter_datastore_name&gt;
+             folder: &lt;vcenter_vm_folder_path&gt;
+             resourcePool: &lt;vsphere_resource_pool&gt;
+             server: &lt;vcenter_server_ip&gt;
+----
+
+
+
+
+
+
+
+= Index
+
+[index]
+== Index</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2022-11-09 23:18:49 -0800
+</div>
+</div>
+</body>
+</html>
