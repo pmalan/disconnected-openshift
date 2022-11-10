@@ -2,17 +2,6 @@
 :icons: font
 :hide-uri-scheme:
 
-
-= Access to vSphere
-
-In order for machine config operator to interact with the vSphere API, we need to expose the endpoint to the Openshift nodes.
-
-In vSphere, you can add a total of 4 network adapters on the appliance. Second adapter will be earmarked for VCHA, so if needed you have to add an additional adapter to configure.
-
-Make sure that the hostname specified to access vCenter, resolves within the subnet as the ip address specified on the third adapter.
-
-NOTE: VMware VCSA 7 multiple network adapters https://4sysops.com/archives/vmware-vcsa-7-multiple-network-adapters/
-
 = DNS
 On a node, with a fixed ip in the disconnected network, install dns. In this example 10.0.0.2. 
 

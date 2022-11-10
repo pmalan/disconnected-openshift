@@ -7,7 +7,7 @@ Pieter Malan
 
 :appendix-caption: Exhibit
 :sectnums:
-:toc: macro
+:toc: left
 
 
 :toclevels: 2
@@ -42,9 +42,14 @@ bla jkdlsfjskldjf
 
 include::{chapters-path}environment/environment.adoc[leveloffset=+1]
 
+== VMWare specific environment
+
+include::{chapters-path}environment/vsphere.adoc[leveloffset=+2]
+
+
 <<<
 
-=== Setup Quay Mirror Registry
+= Setup Quay Mirror Registry
 
 . Download Quay Mirror Registry - https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz
 . Get a signed certificate, a wild card cert does work.
